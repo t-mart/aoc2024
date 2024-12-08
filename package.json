@@ -1,0 +1,38 @@
+{
+  "name": "aoc2024",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "1": "bun run src/day01/main.ts",
+    "2": "bun run src/day02/main.ts",
+    "3": "bun run src/day03/main.ts",
+    "4": "bun run src/day04/main.ts",
+    "5": "bun run src/day05/main.ts",
+    "6": "bun run src/day06/main.ts",
+    "7": "bun run src/day07/main.ts",
+    "8": "bun run src/day08/main.ts",
+    "9": "bun run src/day09/main.ts",
+    "10": "bun run src/day10/main.ts",
+    "11": "bun run src/day11/main.ts",
+    "12": "bun run src/day12/main.ts",
+    "13": "bun run src/day13/main.ts",
+    "14": "bun run src/day14/main.ts",
+    "15": "bun run src/day15/main.ts",
+    "16": "bun run src/day16/main.ts",
+    "17": "bun run src/day17/main.ts",
+    "18": "bun run src/day18/main.ts",
+    "19": "bun run src/day19/main.ts",
+    "20": "bun run src/day20/main.ts",
+    "21": "bun run src/day21/main.ts",
+    "22": "bun run src/day22/main.ts",
+    "23": "bun run src/day23/main.ts",
+    "24": "bun run src/day24/main.ts",
+    "25": "bun run src/day25/main.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
