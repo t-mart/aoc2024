@@ -6,10 +6,19 @@ To install dependencies:
 bun install
 ```
 
-To run:
+Run days with:
 
 ```bash
-bun run index.ts
+# bun run <day>
+bun run 12
 ```
 
-This project was created using `bun init` in bun v1.1.38. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Bigboy inputs are stored compressed with zstd because they sometimes might be
+too large to store on GitHub. To decompress them, run:
+
+```bash
+# zstd -d <file>
+zstd -d src/day09/bigboy.txt.zst
+```
+
+(to compress them, run `zstd -9 <file>`)

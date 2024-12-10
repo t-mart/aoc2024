@@ -139,7 +139,7 @@ export function createDayRunner<I, O>(puzzle: Puzzle<I, O>) {
         i.expectedGold === Skip
           ? undefined
           : {
-              name: "Gold",
+              name: "Gold  ",
               expected: i.expectedGold,
               fn: puzzle.gold,
             },
