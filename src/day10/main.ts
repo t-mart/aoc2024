@@ -1,5 +1,7 @@
 import { createDayRunner, HashSet } from "../util";
 
+// this was the easiest day yet.
+
 type Coordinate = [number, number];
 type Height = number;
 type TopographicMap = {
