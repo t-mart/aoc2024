@@ -227,7 +227,7 @@ if (import.meta.main) {
   })(({ example, aoc, file, Skip, UnknownResult }) => [
     file([import.meta.dirname!, "example2.txt"], 140, 80),
     file([import.meta.dirname!, "example.txt"], 1930, 1206),
-    aoc(1461806, UnknownResult),
+    aoc(1461806, 887932),
     // file([import.meta.dirname!, "bigboy.txt"], 1, 2),
   ]);
 }
