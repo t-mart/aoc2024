@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 type Report = number[];
 
@@ -78,7 +78,7 @@ function gold(reports: Report[]) {
   return safeCount;
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   const exampleData = `7 6 4 2 1
 1 2 7 8 9
 9 7 6 2 1

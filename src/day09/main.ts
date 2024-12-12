@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 type FileId = number;
 type DiskMap = (FileId | null)[];
@@ -255,7 +255,7 @@ function printLL(head: Node | null) {
   process.stdout.write("\n");
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   await createDayRunner({
     day: 9,
     parse,

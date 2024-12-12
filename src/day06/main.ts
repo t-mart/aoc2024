@@ -1,4 +1,4 @@
-import { createDayRunner, HashSet } from "../util";
+import { createDayRunner, HashSet } from "../util.ts";
 
 type Coordinate = [number, number];
 type Orientation = "N" | "E" | "S" | "W";
@@ -219,7 +219,7 @@ function gold(map: Map) {
   return loops;
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   await createDayRunner({
     day: 6,
     parse,

@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 type WordSearch = string[];
 
@@ -93,7 +93,7 @@ function gold(wordSearch: WordSearch) {
   return foundCount;
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   const exampleData = `MMMSXXMASM
 MSAMXMSMSA
 AMXSXMAAMM

@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 // this problem is awful. in trying to stay on theme, the creator has confused
 // how this problem is described.
@@ -77,7 +77,7 @@ function gold(updates: Updates) {
   return base(updates, false);
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   await createDayRunner({
     day: 5,
     parse,

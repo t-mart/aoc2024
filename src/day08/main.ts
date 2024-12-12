@@ -1,4 +1,4 @@
-import { createDayRunner, HashSet } from "../util";
+import { createDayRunner, HashSet } from "../util.ts";
 
 type Coordinate = [number, number];
 type PuzzleMap = {
@@ -111,7 +111,7 @@ function gold(map: PuzzleMap) {
   return antinodes.size();
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   await createDayRunner({
     day: 8,
     parse,

@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 type Lists = [number[], number[]];
 
@@ -58,7 +58,7 @@ function gold(lists: Lists) {
   return similarityScore;
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   const exampleData = `3   4
 4   3
 2   5

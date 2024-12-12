@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 type Equation = {
   result: number;
@@ -81,7 +81,7 @@ function gold(equations: Equation[]) {
   return base(equations, true);
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   await createDayRunner({
     day: 7,
     parse,

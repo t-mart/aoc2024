@@ -1,0 +1,32 @@
+{
+  "tasks": {
+    "1": "deno run -A src/day01/main.ts",
+    "2": "deno run -A src/day02/main.ts",
+    "3": "deno run -A src/day03/main.ts",
+    "4": "deno run -A src/day04/main.ts",
+    "5": "deno run -A src/day05/main.ts",
+    "6": "deno run -A src/day06/main.ts",
+    "7": "deno run -A src/day07/main.ts",
+    "8": "deno run -A src/day08/main.ts",
+    "9": "deno run -A src/day09/main.ts",
+    "10": "deno run -A src/day10/main.ts",
+    "11": "deno run -A src/day11/main.ts",
+    "12": "deno run -A src/day12/main.ts",
+    "13": "deno run -A src/day13/main.ts",
+    "14": "deno run -A src/day14/main.ts",
+    "15": "deno run -A src/day15/main.ts",
+    "16": "deno run -A src/day16/main.ts",
+    "17": "deno run -A src/day17/main.ts",
+    "18": "deno run -A src/day18/main.ts",
+    "19": "deno run -A src/day19/main.ts",
+    "20": "deno run -A src/day20/main.ts",
+    "21": "deno run -A src/day21/main.ts",
+    "22": "deno run -A src/day22/main.ts",
+    "23": "deno run -A src/day23/main.ts",
+    "24": "deno run -A src/day24/main.ts",
+    "25": "deno run -A src/day25/main.ts"
+  },
+  "imports": {
+    "heap-js": "npm:heap-js@^2.5.0"
+  }
+}

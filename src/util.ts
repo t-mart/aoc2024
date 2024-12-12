@@ -1,20 +1,19 @@
-import { join } from "path";
+import * as path from "jsr:@std/path";
+import "jsr:@std/dotenv/load";
 
 async function getInput(day: number, year: number = 2024) {
   const url = `https://adventofcode.com/${year}/day/${day}/input`;
 
-  const response = fetch(url, {
+  const response = await fetch(url, {
     headers: {
-      cookie: `session=${process.env.SESSION_COOKIE}`,
+      cookie: `session=${Deno.env.get("SESSION_COOKIE")}`,
     },
   });
-  return (await response).text();
+  return response.text();
 }
 
 async function readFile(...pathSegments: string[]) {
-  const path = join(...pathSegments);
-  const f = Bun.file(path);
-  return await f.text();
+  return await Deno.readTextFile(path.join(...pathSegments));
 }
 
 type PuzzlePart<I, O> = (input: I) => O;
@@ -203,19 +202,22 @@ export class HashMap<K, V> {
     this.map.clear();
   }
 
-  keys() {
-    return Array.from(this.map.values()).map((entry) => entry.key);
+  *keys() {
+    for (const { key } of this.map.values()) {
+      yield key;
+    }
   }
 
-  values() {
-    return Array.from(this.map.values()).map((entry) => entry.value);
+  *values() {
+    for (const { value } of this.map.values()) {
+      yield value;
+    }
   }
 
-  entries() {
-    return Array.from(this.map.values()).map((entry) => [
-      entry.key,
-      entry.value,
-    ]);
+  *entries() {
+    for (const { key, value } of this.map.values()) {
+      yield [key, value] as [K, V];
+    }
   }
 
   size() {
@@ -248,12 +250,20 @@ export class HashSet<T> {
     this.map.clear();
   }
 
-  values() {
-    return this.map.keys();
+  *values() {
+    for (const key of this.map.keys()) {
+      yield key;
+    }
   }
 
   size() {
     return this.map.size();
+  }
+
+  *iter() {
+    for (const key of this.values()) {
+      yield key;
+    }
   }
 
   difference(other: HashSet<T>) {
@@ -301,5 +311,26 @@ export class HashSet<T> {
 
   isSupersetOf(other: HashSet<T>) {
     return other.difference(this).size() === 0;
+  }
+}
+
+export class Counter<T> {
+  private map: HashMap<T, number>;
+
+  constructor(hashFunction: (key: T) => Hash) {
+    this.map = new HashMap(hashFunction);
+  }
+
+  add(key: T, amount: number = 1) {
+    const current = this.map.get(key) ?? 0;
+    this.map.set(key, current + amount);
+  }
+
+  get(key: T) {
+    return this.map.get(key) ?? 0;
+  }
+
+  total() {
+    return [...this.map.values()].reduce((acc, curr) => acc + curr, 0);
   }
 }

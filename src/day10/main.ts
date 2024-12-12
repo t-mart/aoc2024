@@ -1,4 +1,4 @@
-import { createDayRunner, HashSet } from "../util";
+import { createDayRunner, HashSet } from "../util.ts";
 
 // this was the easiest day yet.
 
@@ -122,7 +122,7 @@ function gold(topographicMap: TopographicMap) {
   });
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   await createDayRunner({
     day: 10,
     parse,

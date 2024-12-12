@@ -1,4 +1,4 @@
-import { createDayRunner } from "../util";
+import { createDayRunner } from "../util.ts";
 
 type Foo = string[];
 
@@ -17,7 +17,7 @@ function gold(foo: Foo) {
   return 2;
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   const exampleData = ``;
 
   await createDayRunner({
