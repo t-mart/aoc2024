@@ -138,57 +138,31 @@ function floodRegion2(
     fenceSides++;
     fences.delete(start);
     
-    if (start.side === "right") {
+    if (start.side === "right" || start.side === "left") {
       // go up
-      let f = {coord: [start.coord[0], start.coord[1] - 1] as Coordinate, side: "right" as Side};
+      let f = {coord: [start.coord[0], start.coord[1] - 1] as Coordinate, side: start.side as Side};
       while (fences.has(f)) {
         fences.delete(f);
-        f = {coord: [f.coord[0], f.coord[1] - 1], side: "right"};
+        f = {coord: [f.coord[0], f.coord[1] - 1], side: start.side};
       }
       // go down
-      f = {coord: [start.coord[0], start.coord[1] + 1], side: "right"};
+      f = {coord: [start.coord[0], start.coord[1] + 1], side: start.side};
       while (fences.has(f)) {
         fences.delete(f);
-        f = {coord: [f.coord[0], f.coord[1] + 1], side: "right"};
-      }
-    } else if (start.side === "left") {
-      // go up
-      let f = {coord: [start.coord[0], start.coord[1] - 1] as Coordinate, side: "left" as Side};
-      while (fences.has(f)) {
-        fences.delete(f);
-        f = {coord: [f.coord[0], f.coord[1] - 1], side: "left"};
-      }
-      // go down
-      f = {coord: [start.coord[0], start.coord[1] + 1], side: "left"};
-      while (fences.has(f)) {
-        fences.delete(f);
-        f = {coord: [f.coord[0], f.coord[1] + 1], side: "left"};
-      }
-    } else if (start.side === "top") {
-      // go left
-      let f = {coord: [start.coord[0] - 1, start.coord[1]] as Coordinate, side: "top" as Side};
-      while (fences.has(f)) {
-        fences.delete(f);
-        f = {coord: [f.coord[0] - 1, f.coord[1]], side: "top"};
-      }
-      // go right
-      f = {coord: [start.coord[0] + 1, start.coord[1]], side: "top"};
-      while (fences.has(f)) {
-        fences.delete(f);
-        f = {coord: [f.coord[0] + 1, f.coord[1]], side: "top"};
+        f = {coord: [f.coord[0], f.coord[1] + 1], side: start.side};
       }
     } else {
       // go left
-      let f = {coord: [start.coord[0] - 1, start.coord[1]] as Coordinate, side: "bottom" as Side};
+      let f = {coord: [start.coord[0] - 1, start.coord[1]] as Coordinate, side: start.side as Side};
       while (fences.has(f)) {
         fences.delete(f);
-        f = {coord: [f.coord[0] - 1, f.coord[1]], side: "bottom"};
+        f = {coord: [f.coord[0] - 1, f.coord[1]], side: start.side};
       }
       // go right
-      f = {coord: [start.coord[0] + 1, start.coord[1]], side: "bottom"};
+      f = {coord: [start.coord[0] + 1, start.coord[1]], side: start.side};
       while (fences.has(f)) {
         fences.delete(f);
-        f = {coord: [f.coord[0] + 1, f.coord[1]], side: "bottom"};
+        f = {coord: [f.coord[0] + 1, f.coord[1]], side: start.side};
       }
     }
   }
