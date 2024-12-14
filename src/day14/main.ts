@@ -113,28 +113,34 @@ function drawRobots(robots: Robot[], size: [number, number]): void {
 }
 
 /**
- * this method is brittle and is tainted by being aware of the intended result
+ * At least, return if the robots' positions "draw" a christmas tree when
+ * rendered on a grid of size `size` when viewed from a bird's eye view.
+ * 
+ * This method is brittle and is tainted by being aware of the intended result
  * before writing.
  *
- * we want to return true when one of the quadrants' counts is, arbitrarily, 1.5
- * times larger than all others. 1.5 is just something i chose because the
+ * We want to return true when one of the quadrants' counts is, arbitrarily, 1.5
+ * times larger than all others. 1.5 is just something I chose because the
  * robots' position will be dense in one of these quadrants.
  *
- * the problem's definition is poorly defined. i had to look online for help for
- * what the tree looked like. there were so many approaches:
+ * This AOC problem's definition is inadequate. I searched online for help for
+ * what the tree looked like. There were so many approaches:
  * - rendering to PNG and looking at images manually
  * - rendering to PNG and finding minimum size (because dense robots are easier
  *   to compress by PNG algo)
  * - looking for high occurrences of neighboring robots
  * - and more.
+ * 
+ * But, neither of these approaches identify a christmas tree, even though they
+ * were successful. At least, this AOC problem filters out LLMs.
  *
- * before, i had tried things like checking if the robots were stritcly
+ * Before, I had tried things like checking if the robots were
  * symmetrically-positioned, but that didn't work because the tree
  * 1) does not utilize all robots and 2) is not centered on the grid.
  *
- * instead, we use this implementation, which is practically an extension of the
- * first "silver" part's calculateSafetyFactor method (and therefore is probably
- * what eric intended): we count the number of robots in each quadrant and return
+ * Instead, we use this implementation, which is an extension of the first
+ * "silver" part's calculateSafetyFactor method (and therefore is probably what
+ * eric intended): we count the number of robots in each quadrant and return
  * true if one of the quadrants has a lot more robots than the others (1.5 times
  * more).
  */
