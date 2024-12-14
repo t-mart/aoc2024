@@ -113,40 +113,31 @@ function drawRobots(robots: Robot[], size: [number, number]): void {
 }
 
 /**
- * Relative to the center of the grid, for each robot on the left, is there a robot reflected on the right? Robots in the center will be ignored.
- * @param robots
- * @param size
- * @returns
+ * this method is brittle and is tainted by being aware of the intended result
+ * before writing.
+ *
+ * we want to return true when one of the quadrants' counts is, arbitrarily, 1.5
+ * times larger than all others. 1.5 is just something i chose because the
+ * robots' position will be dense in one of these quadrants.
+ *
+ * the problem's definition is poorly defined. i had to look online for help for
+ * what the tree looked like. there were so many approaches:
+ * - rendering to PNG and looking at images manually
+ * - rendering to PNG and finding minimum size (because dense robots are easier
+ *   to compress by PNG algo)
+ * - looking for high occurrences of neighboring robots
+ * - and more.
+ *
+ * before, i had tried things like checking if the robots were stritcly
+ * symmetrically-positioned, but that didn't work because the tree
+ * 1) does not utilize all robots and 2) is not centered on the grid.
+ *
+ * instead, we use this implementation, which is practically an extension of the
+ * first "silver" part's calculateSafetyFactor method (and therefore is probably
+ * what eric intended): we count the number of robots in each quadrant and return
+ * true if one of the quadrants has a lot more robots than the others (1.5 times
+ * more).
  */
-function isLeftRightSymmetrical(
-  robots: Robot[],
-  size: [number, number]
-): boolean {
-  const counter = new Counter<Coordinate>(([x, y]) => x * size[1] + y);
-
-  const midX = Math.floor(size[0] / 2);
-  const midY = Math.floor(size[1] / 2);
-
-  for (const robot of robots) {
-    // translate into [distance from midX, y]
-    // add to counter at this coordinate.
-    const [x, y] = robot.position;
-    if (x === midX) {
-      continue;
-    }
-    const translatedX = x < midX ? midX - x : x - midX;
-    counter.add([translatedX, y]);
-  }
-
-  // then check that for each coordinate, the count is 2 (or is even)
-  for (const count of counter.values()) {
-    if (count % 2 !== 0) {
-      return false;
-    }
-  }
-  return true;
-}
-
 function containsChristmasTree(
   robotCoordinates: Coordinate[],
   size: [number, number]
@@ -175,15 +166,11 @@ function containsChristmasTree(
     }
   }
 
-  // ok, we're changing the criteria. we want to return when one of the
-  // quadrants' counts is, say 1.5 times larger than all others. 1.5 is
-  // arbitrary. the problem's definition is poorly defined. i had to come to
-  // this solution. before, i had tried things like checking if the robots were
-  // symmetrically-positioned, but that didn't work because the tree 1) does not
-  // utilize all robots and 2) is not centered on the grid.
+  const factor = 1.5;
+
   return (
     Math.max(topLeftCount, topRightCount, bottomLeftCount, bottomRightCount) >
-    1.5 *
+    factor *
       (topLeftCount +
         topRightCount +
         bottomLeftCount +
@@ -201,7 +188,6 @@ function gold(robots: Robot[]) {
   robots = structuredClone(robots);
   const size = (isExample(robots) ? [11, 7] : [101, 103]) as [number, number];
   let iterations = 0;
-  let found = 0;
   while (true) {
     if (
       containsChristmasTree(
@@ -209,8 +195,6 @@ function gold(robots: Robot[]) {
         size
       )
     ) {
-      // console.log(iterations);
-      // drawRobots(robots, size);
       return iterations;
     }
     robots = robots.map((robot) => ({
