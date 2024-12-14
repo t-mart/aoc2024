@@ -333,4 +333,22 @@ export class Counter<T> {
   total() {
     return [...this.map.values()].reduce((acc, curr) => acc + curr, 0);
   }
+
+  *keys() {
+    for (const key of this.map.keys()) {
+      yield key;
+    }
+  }
+
+  *values() {
+    for (const value of this.map.values()) {
+      yield value;
+    }
+  }
+
+  *entries() {
+    for (const [key, value] of this.map.entries()) {
+      yield [key, value] as [T, number];
+    }
+  }
 }
