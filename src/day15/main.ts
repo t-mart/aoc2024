@@ -260,6 +260,6 @@ if (import.meta.main) {
     file([import.meta.dirname!, "example.txt"], 2028, Skip),
     file([import.meta.dirname!, "example2.txt"], 10092, 9021),
     aoc(1349898, 1376686),
-    // file([import.meta.dir, "bigboy.txt"], 1, 2),
+    file([import.meta.dirname!, "bigboy.txt"], 356166839889, 359696176529),
   ]);
 }
