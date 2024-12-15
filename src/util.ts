@@ -352,3 +352,54 @@ export class Counter<T> {
     }
   }
 }
+
+export type Coordinate = [number, number];
+
+export class Grid<T> {
+  constructor(private data: T[][]) {}
+
+  /**
+   * Create a new Grid from a string input.
+   * @param input The string that represents the grid.
+   * @param parse A function that converts a string to a value of type T.
+   * @param splitRows A function that splits the input into rows. Defaults to splitting on newlines.
+   * @param splitColumns A function that splits a row into columns. Defaults to splitting on each character.
+   * @returns A new Grid instance.
+   */
+  static fromString<T>(
+    input: string,
+    parse: (item: string, x: number, y: number) => T,
+    splitRows: (input: string) => string[] = (input) => input.split("\n"),
+    splitColumns: (input: string) => string[] = (input) => input.split("")
+  ) {
+    const rows = splitRows(input)
+      .map((row) => row.trim())
+      .filter((row) => row.length > 0);
+    const data = rows.map((row, y) =>
+      splitColumns(row).map((item, x) => parse(item, x, y))
+    );
+    return new Grid(data);
+  }
+
+  get(coordinate: Coordinate): T | undefined {
+    const [x, y] = coordinate;
+    return this.data[y]?.[x];
+  }
+
+  set(coordinate: Coordinate, value: T) {
+    const [x, y] = coordinate;
+    const row = this.data[y];
+    if (!row) {
+      throw new Error(`Row ${y} does not exist`);
+    }
+    row[x] = value;
+  }
+
+  get width() {
+    return this.data[0]?.length ?? 0;
+  }
+
+  get height() {
+    return this.data.length;
+  }
+}
