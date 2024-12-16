@@ -1,13 +1,10 @@
-import { createDayRunner } from "../util.ts";
+import { createDayRunner, Grid, Coordinate } from "../util.ts";
 
-type Space = "wall" | "box" | "empty" | "lanternfish";
-type WideSpace = "wall" | "boxleft" | "boxright" | "empty" | "lanternfish";
-type Move = "up" | "down" | "left" | "right";
-type Coordinate = [number, number];
+type Space = "wall" | "box" | "boxleft" | "boxright" | "empty" | "lanternfish";
 type Input = {
-  map: Space[][];
+  map: Grid<Space>;
   lanternfishCoordinate: Coordinate;
-  moves: Move[];
+  moves: Coordinate[];
 };
 
 function parse(input: string): Input {
@@ -15,36 +12,36 @@ function parse(input: string): Input {
 
   let lanternfishCoordinate: Coordinate | undefined;
 
-  const map = mapPart.split("\n").map((line, y) =>
-    line.split("").map((char, x) => {
-      switch (char) {
-        case "#":
-          return "wall";
-        case "O":
-          return "box";
-        case ".":
-          return "empty";
-        default:
-          if (lanternfishCoordinate) {
-            throw new Error("Multiple lanternfish found");
-          }
-          lanternfishCoordinate = [x, y];
-          return "lanternfish";
-      }
-    })
-  );
+  const map = Grid.fromString(mapPart, (char, x, y) => {
+    switch (char) {
+      case "#":
+        return "wall";
+      case "O":
+        return "box";
+      case ".":
+        return "empty";
+      default:
+        if (lanternfishCoordinate) {
+          throw new Error("Multiple lanternfish found");
+        }
+        lanternfishCoordinate = new Coordinate(x, y);
+        return "lanternfish";
+    }
+  });
+
+  const origin = Coordinate.origin();
 
   const moves = movesPart.split("\n").flatMap((line) =>
     line.split("").map((char) => {
       switch (char) {
         case "^":
-          return "up";
+          return origin.up();
         case "v":
-          return "down";
+          return origin.down();
         case "<":
-          return "left";
+          return origin.left();
         default:
-          return "right";
+          return origin.right();
       }
     })
   );
@@ -60,48 +57,19 @@ function parse(input: string): Input {
   };
 }
 
-const deltas = new Map<Move, Coordinate>([
-  ["up", [0, -1]],
-  ["down", [0, 1]],
-  ["left", [-1, 0]],
-  ["right", [1, 0]],
-]);
-
-function push(coordinate: Coordinate, move: Move, map: Space[][]): boolean {
-  const [x, y] = coordinate;
-  const space = map[y][x];
-
-  if (space === "empty") {
-    // true means you can push
-    return true;
-  } else if (space === "wall") {
-    // false means you can't push
-    return false;
+function calculateGPSCoordinate(map: Grid<Space>) {
+  let sum = 0;
+  for (const [space, coordinate] of map.iter()) {
+    if (space === "box" || space === "boxleft") {
+      sum += coordinate.x + coordinate.y * 100;
+    }
   }
-
-  // otherwise, we can move if the next space can move
-  const delta = deltas.get(move)!;
-  const nextCoord = [x + delta[0], y + delta[1]] as Coordinate;
-  const nextPush = push(nextCoord, move, map);
-
-  if (nextPush) {
-    map[nextCoord[1]][nextCoord[0]] = space;
-    map[y][x] = "empty";
-  }
-
-  return nextPush;
+  return sum;
 }
 
-function calculateGPSCoordinate(map: (Space | WideSpace)[][]) {
-  return map
-    .flatMap((row, y) => row.map((space, x) => [space, x, y] as const))
-    .filter(([space]) => space === "box" || space === "boxleft")
-    .reduce((acc, [, x, y]) => acc + x + y * 100, 0);
-}
-
-function drawMap(map: (Space | WideSpace)[][]) {
-  const output = map
-    .map((row) => {
+function drawMap(map: Grid<Space>) {
+  const output = [...map.iter_rows()]
+    .map(([row]) => {
       return row
         .map((space) => {
           switch (space) {
@@ -126,128 +94,123 @@ function drawMap(map: (Space | WideSpace)[][]) {
 }
 
 function silver(input: Input) {
-  const map = structuredClone(input.map);
-  const lanternfishCoordinate = structuredClone(input.lanternfishCoordinate);
-
-  for (const move of input.moves) {
-    const wasPushed = push(lanternfishCoordinate, move, map);
-    if (wasPushed) {
-      const delta = deltas.get(move)!;
-      lanternfishCoordinate[0] += delta[0];
-      lanternfishCoordinate[1] += delta[1];
-    }
-  }
-
-  return calculateGPSCoordinate(map);
+  return base(input);
 }
 
-function peekPush(
-  coordinate: Coordinate,
-  move: Move,
-  map: WideSpace[][]
-): boolean {
-  const [x, y] = coordinate;
-  const delta = deltas.get(move)!;
-  const nextCoord = [x + delta[0], y + delta[1]] as Coordinate;
-  const [nextX, nextY] = nextCoord;
-  const nextSpace = map[y][x];
+function moveIsUpOrDown(move: Coordinate): boolean {
+  return move[1] !== 0;
+}
 
-  if (nextSpace === "wall") {
+function canPush(
+  coordinate: Coordinate,
+  move: Coordinate,
+  map: Grid<Space>
+): boolean {
+  const thisSpace = map.get(coordinate)!;
+  const nextCoord = coordinate.plus(move);
+
+  if (thisSpace === "wall") {
     return false;
-  } else if (nextSpace === "empty") {
+  } else if (thisSpace === "empty") {
     return true;
   }
 
-  // other may account for another half of the box to move, but defaults to true
+  // other may account for another half of the box to move if applicable
   let other = true;
 
-  if (nextSpace === "boxleft" && (move === "up" || move === "down")) {
-    other = peekPush([nextX + 1, nextY], move, map);
-  } else if (nextSpace === "boxright" && (move === "up" || move === "down")) {
-    other = peekPush([nextX - 1, nextY], move, map);
+  if (moveIsUpOrDown(move)) {
+    if (thisSpace === "boxleft") {
+      other = canPush(nextCoord.right(), move, map);
+    } else if (thisSpace === "boxright") {
+      other = canPush(nextCoord.left(), move, map);
+    }
   }
 
-  return peekPush(nextCoord, move, map) && other;
+  return canPush(nextCoord, move, map) && other;
 }
 
 /**
- * Push stuff. This method must only be called if peekPush returns true.
+ * Push stuff. This method must only be called if canPush returns true.
  * @param coordinate
  * @param move
  * @param map
  * @returns
  */
-function pushWide(
+function push(
   coordinate: Coordinate,
-  move: Move,
-  map: WideSpace[][]
+  move: Coordinate,
+  map: Grid<Space>
 ): void {
-  const [x, y] = coordinate;
-  const thisSpace = map[y][x];
+  const thisSpace = map.get(coordinate)!;
 
   if (thisSpace === "empty" || thisSpace === "wall") {
     return;
   }
 
-  const delta = deltas.get(move)!;
-  const nextCoord = [x + delta[0], y + delta[1]] as Coordinate;
-  const [nextX, nextY] = nextCoord;
+  const nextCoord = coordinate.plus(move);
 
-  pushWide(nextCoord, move, map);
+  push(nextCoord, move, map);
 
-  if (thisSpace === "boxleft" && (move === "up" || move === "down")) {
-    pushWide([nextX + 1, nextY], move, map);
-  } else if (thisSpace === "boxright" && (move === "up" || move === "down")) {
-    pushWide([nextX - 1, nextY], move, map);
-  }
-
-  map[nextY][nextX] = thisSpace;
-  map[y][x] = "empty";
-
-  if (thisSpace === "boxleft" && (move === "up" || move === "down")) {
-    map[nextY][nextX + 1] = "boxright";
-    map[y][x + 1] = "empty";
-  } else if (thisSpace === "boxright" && (move === "up" || move === "down")) {
-    map[nextY][nextX - 1] = "boxleft";
-    map[y][x - 1] = "empty";
-  }
-}
-
-function gold(input: Input) {
-  const map = input.map.map((row) =>
-    row.flatMap((space) => {
-      switch (space) {
-        case "box":
-          return ["boxleft", "boxright"];
-        case "lanternfish":
-          return ["lanternfish", "empty"];
-        case "wall":
-          return ["wall", "wall"];
-        default:
-          return ["empty", "empty"];
-      }
-    })
-  ) as WideSpace[][];
-  // drawMap(map);
-
-  let lanternfishCoordinate = [
-    input.lanternfishCoordinate[0] * 2,
-    input.lanternfishCoordinate[1],
-  ] as Coordinate;
-  // console.log(lanternfishCoordinate);
-
-  for (const move of input.moves) {
-    if (peekPush(lanternfishCoordinate, move, map)) {
-      pushWide(lanternfishCoordinate, move, map);
-      const delta = deltas.get(move)!;
-      lanternfishCoordinate[0] += delta[0];
-      lanternfishCoordinate[1] += delta[1];
+  if (moveIsUpOrDown(move)) {
+    if (thisSpace === "boxleft") {
+      // push([nextX + 1, nextY], move, map);
+      push(nextCoord.right(), move, map);
+    } else if (thisSpace === "boxright") {
+      push(nextCoord.left(), move, map);
     }
   }
 
-  // drawMap(map);
+  map.set(nextCoord, thisSpace);
+  map.set(coordinate, "empty");
+
+  if (moveIsUpOrDown(move)) {
+    if (thisSpace === "boxleft") {
+      map.set(nextCoord.right(), "boxright");
+      map.set(coordinate.right(), "empty");
+    } else if (thisSpace === "boxright") {
+      map.set(nextCoord.left(), "boxleft");
+      map.set(coordinate.left(), "empty");
+    }
+  }
+}
+
+function base(input: Input) {
+  const map = input.map.clone();
+
+  let lanternfishCoordinate = new Coordinate(
+    input.lanternfishCoordinate[0] * 2,
+    input.lanternfishCoordinate[1]
+  );
+
+  for (const move of input.moves) {
+    if (canPush(lanternfishCoordinate, move, map)) {
+      push(lanternfishCoordinate, move, map);
+      lanternfishCoordinate = lanternfishCoordinate.plus(move);
+    }
+  }
 
   return calculateGPSCoordinate(map);
+}
+
+function gold(input: Input) {
+  const map = new Grid<Space>(
+    [...input.map.iter_rows()].map(([row]) =>
+      row.flatMap((space) => {
+        switch (space) {
+          case "box":
+            return ["boxleft", "boxright"];
+          case "lanternfish":
+            return ["lanternfish", "empty"];
+          case "wall":
+            return ["wall", "wall"];
+          default:
+            return ["empty", "empty"];
+        }
+      })
+    )
+  );
+
+  return base({ ...input, map });
 }
 
 if (import.meta.main) {
@@ -260,6 +223,6 @@ if (import.meta.main) {
     file([import.meta.dirname!, "example.txt"], 2028, Skip),
     file([import.meta.dirname!, "example2.txt"], 10092, 9021),
     aoc(1349898, 1376686),
-    file([import.meta.dirname!, "bigboy.txt"], 356166839889, 359696176529),
+    // file([import.meta.dirname!, "bigboy.txt"], 356166839889, 359696176529),
   ]);
 }

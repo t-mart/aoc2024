@@ -353,7 +353,77 @@ export class Counter<T> {
   }
 }
 
-export type Coordinate = [number, number];
+export class Coordinate extends Array<number> {
+  constructor(x: number, y: number) {
+    super(2);
+    this[0] = x;
+    this[1] = y;
+  }
+
+  get x() {
+    return this[0];
+  }
+
+  get y() {
+    return this[1];
+  }
+
+  static fromArray(arr: [number, number]) {
+    return new Coordinate(arr[0], arr[1]);
+  }
+
+  plus(other: Coordinate) {
+    return new Coordinate(this[0] + other[0], this[1] + other[1]);
+  }
+
+  minus(other: Coordinate) {
+    return new Coordinate(this[0] - other[0], this[1] - other[1]);
+  }
+
+  static origin() {
+    return new Coordinate(0, 0);
+  }
+
+  right() {
+    return this.plus(new Coordinate(1, 0));
+  }
+
+  left() {
+    return this.plus(new Coordinate(-1, 0));
+  }
+
+  up() {
+    return this.plus(new Coordinate(0, -1));
+  }
+
+  down() {
+    return this.plus(new Coordinate(0, 1));
+  }
+
+  upRight() {
+    return this.plus(new Coordinate(1, -1));
+  }
+
+  upLeft() {
+    return this.plus(new Coordinate(-1, -1));
+  }
+
+  downRight() {
+    return this.plus(new Coordinate(1, 1));
+  }
+
+  downLeft() {
+    return this.plus(new Coordinate(-1, 1));
+  }
+
+  equals(other: Coordinate) {
+    return this[0] === other[0] && this[1] === other[1];
+  }
+
+  distanceTo(other: Coordinate) {
+    return Math.abs(this[0] - other[0]) + Math.abs(this[1] - other[1]);
+  }
+}
 
 export class Grid<T> {
   constructor(private data: T[][]) {}
@@ -401,5 +471,23 @@ export class Grid<T> {
 
   get height() {
     return this.data.length;
+  }
+
+  *iter() {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        yield [this.data[y][x], [x, y]] as [T, Coordinate];
+      }
+    }
+  }
+
+  *iter_rows() {
+    for (let y = 0; y < this.height; y++) {
+      yield [this.data[y], y] as [T[], number];
+    }
+  }
+
+  clone() {
+    return new Grid(structuredClone(this.data));
   }
 }
