@@ -184,12 +184,12 @@ function pairWiseCompare(a: number[], b: number[]): number {
   return 0;
 }
 
-function gold(input: Computer) {
-  const target = input.program;
+function gold(computer: Computer) {
+  const target = computer.program;
   const targetLength = target.length;
   let override = 0n;
   while (override < 8n ** BigInt(targetLength)) {
-    const result = run(input, override);
+    const result = run(computer, override);
     
     const cmp = pairWiseCompare(result, target);
 
