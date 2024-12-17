@@ -18,34 +18,35 @@ async function readFile(...pathSegments: string[]) {
 
 type PuzzlePart<I, O> = (input: I) => O;
 type ParserFn<I> = (input: string) => I;
-type Puzzle<I, O> = {
+type Puzzle<I, S, G = S> = {
   day: number;
-  silver: PuzzlePart<I, O>;
-  gold: PuzzlePart<I, O>;
+  silver: PuzzlePart<I, S>;
+  gold: PuzzlePart<I, G>;
 } & (I extends string
   ? Partial<{ parse: ParserFn<I> }>
   : { parse: ParserFn<I> });
 
-export function createDayRunner<I, O>(puzzle: Puzzle<I, O>) {
+export function createDayRunner<I, S, G = S>(puzzle: Puzzle<I, S, G>) {
   const UnknownResult = Symbol("UnknownResult");
   const Skip = Symbol("Skip");
 
   type UnknownResultType = typeof UnknownResult;
   type SkipType = typeof Skip;
-  type GoldSilverTest = O | UnknownResultType | SkipType | undefined;
+  type SilverTest = S | UnknownResultType | SkipType | undefined;
+  type GoldTest = G | UnknownResultType | SkipType | undefined;
   type Data = string | Promise<string>;
   type TestableInput = {
     data: Data;
     name: string;
-    expectedSilver: GoldSilverTest;
-    expectedGold: GoldSilverTest;
+    expectedSilver: SilverTest;
+    expectedGold: GoldTest;
   };
 
   function raw(
     data: Data,
     name: string,
-    expectedSilver: GoldSilverTest,
-    expectedGold: GoldSilverTest
+    expectedSilver: SilverTest,
+    expectedGold: GoldTest
   ): TestableInput {
     return {
       data,
@@ -58,22 +59,22 @@ export function createDayRunner<I, O>(puzzle: Puzzle<I, O>) {
 
   function example(
     data: string,
-    expectedSilver: GoldSilverTest,
-    expectedGold: GoldSilverTest
+    expectedSilver: SilverTest,
+    expectedGold: GoldTest
   ) {
     return raw(data, "example", expectedSilver, expectedGold);
   }
   type ExampleFn = typeof example;
 
-  function aoc(expectedSilver: GoldSilverTest, expectedGold: GoldSilverTest) {
+  function aoc(expectedSilver: SilverTest, expectedGold: GoldTest) {
     return raw(getInput(puzzle.day), "aoc", expectedSilver, expectedGold);
   }
   type AocFn = typeof aoc;
 
   function file(
     pathSegments: string[],
-    expectedSilver: GoldSilverTest,
-    expectedGold: GoldSilverTest
+    expectedSilver: SilverTest,
+    expectedGold: GoldTest
   ) {
     return raw(
       readFile(...pathSegments),
@@ -169,7 +170,7 @@ export function createDayRunner<I, O>(puzzle: Puzzle<I, O>) {
   };
 }
 
-type Hash = string | number | boolean | BigInt;
+type Hash = string | number | boolean | bigint;
 
 export class HashMap<K, V> {
   private map: Map<Hash, { key: K; value: V }>;
