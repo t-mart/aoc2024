@@ -1,33 +1,30 @@
 import { createDayRunner } from "../util.ts";
 
-type Foo = string[];
+type Input = {};
 
-function parse(input: string): Foo {
+function parse(input: string): Input {
   return input
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line);
 }
 
-function silver(foo: Foo) {
+function silver(input: Input) {
   return 1;
 }
 
-function gold(foo: Foo) {
+function gold(input: Input) {
   return 2;
 }
 
 if (import.meta.main) {
-  const exampleData = ``;
-
   await createDayRunner({
     day: 20,
     parse,
     silver,
     gold,
   })(({ example, aoc, file, Skip, UnknownResult }) => [
-    example(exampleData, 1, 2),
-    aoc(UnknownResult, UnknownResult),
-    // file([import.meta.dir, "bigboy.txt"], 1, 2),
+    file([import.meta.dirname!, "example.txt"], 1, Skip),
+    aoc(UnknownResult, Skip),
   ]);
 }
