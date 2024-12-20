@@ -57,7 +57,7 @@ function getDistanceFromStart(
   while (!current.equals(end)) {
     distanceMap.set(current, currentDistance++);
     current = current
-      .around()
+      .aroundManhattan()
       .find(
         (c) =>
           !walls.has(c) &&
