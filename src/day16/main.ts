@@ -128,7 +128,7 @@ function base(input: Input) {
     directions.indexOf(dc.direction);
 
   const manhattanDistanceToEnd = (coordinate: Coordinate) =>
-    coordinate.distanceTo(input.end);
+    coordinate.manhattanDistanceTo(input.end);
   const openSet = new HashSet<DirectionCoordinate>(hashCoord);
   const cameFrom = new HashMap<
     DirectionCoordinate,

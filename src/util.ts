@@ -401,6 +401,14 @@ export class Coordinate extends Array<number> {
     return this.plus(new Coordinate(0, 1));
   }
 
+  /**
+   * Get all coordinates that are adjacent to this coordinate (up, down, left, right).
+   * @returns An array of all adjacent coordinates.
+   */
+  aroundManhattan() {
+    return [this.right(), this.left(), this.up(), this.down()] as Coordinate[];
+  }
+
   upRight() {
     return this.plus(new Coordinate(1, -1));
   }
@@ -417,12 +425,78 @@ export class Coordinate extends Array<number> {
     return this.plus(new Coordinate(-1, 1));
   }
 
+  /**
+   * Get all coordinates that are diagonal to this coordinate (up-right,
+   * up-left, down-right, down-left).
+   * @returns An array of all diagonal coordinates.
+   */
+  aroundDiagonal() {
+    return [
+      this.upRight(),
+      this.upLeft(),
+      this.downRight(),
+      this.downLeft(),
+    ] as Coordinate[];
+  }
+
+  /**
+   * Get all coordinates that are adjacent to this coordinate (including diagonals).
+   * @returns An array of all adjacent coordinates.
+   */
+  around() {
+    return [...this.aroundManhattan(), ...this.aroundDiagonal()];
+  }
+
+  /**
+   * Return true if this coordinate is equal to another coordinate.
+   * @param other The other coordinate to compare to.
+   * @returns True if the coordinates are equal, false otherwise.
+   */
   equals(other: Coordinate) {
     return this[0] === other[0] && this[1] === other[1];
   }
 
-  distanceTo(other: Coordinate) {
+  /**
+   * Calculate the manhattan distance between this coordinate and another coordinate.
+   * @param other The other coordinate to calculate the distance to.
+   * @returns The manhattan distance between the two coordinates.
+   */
+  manhattanDistanceTo(other: Coordinate) {
     return Math.abs(this[0] - other[0]) + Math.abs(this[1] - other[1]);
+  }
+
+  /**
+   * Iterate over all coordinates that are a certain manhattan distance away
+   * from this coordinate.
+   * @param distance The manhattan distance to iterate over.
+   */
+  *iterManhattanDistanceAway(distance: number) {
+    if (distance === 0) {
+      throw new Error("Distance must be greater than 0");
+    }
+    for (const [c, d] of this.iterUpToManhattanDistanceAway(distance)) {
+      if (d === distance) {
+        yield c;
+      }
+    }
+  }
+
+  /**
+   * Iterate over all coordinates that are up to a certain manhattan distance away
+   * from this coordinate. Exclude the coordinate itself.
+   * @param distance The maximum manhattan distance to iterate up to.
+   */
+  *iterUpToManhattanDistanceAway(
+    distance: number
+  ): Generator<[Coordinate, number]> {
+    for (let y = -distance; y <= distance; y++) {
+      for (let x = -distance; x <= distance; x++) {
+        const thisManhattanDistance = Math.abs(x) + Math.abs(y);
+        if (thisManhattanDistance <= distance && thisManhattanDistance > 0) {
+          yield [this.plus(new Coordinate(x, y)), thisManhattanDistance];
+        }
+      }
+    }
   }
 }
 
